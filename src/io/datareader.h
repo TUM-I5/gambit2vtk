@@ -44,7 +44,7 @@ class DataReader
 public:
 	virtual ~DataReader() {}
 
-	virtual void parseData() = 0;
+	virtual void parseData(unsigned long size) = 0;
 
 	/** The name of this data */
 	virtual const char* dataName() = 0;

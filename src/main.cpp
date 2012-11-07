@@ -36,12 +36,14 @@
 #include "config/args.h"
 #include "converter/gambit2vtk.h"
 #include "io/gambitreader.h"
+#include "io/simpledatareader.h"
 #include "io/xmlwriter.h"
 #include "tools/logger.h"
 
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <vector>
 
 /**
  * Check if file already exists
@@ -102,7 +104,31 @@ int main(int argc, char** argv)
 	io::GambitReader gambitReader(*gambitStream);
 	io::XMLWriter xmlWriter(*vtkStream);
 
-	converter::Gambit2VTK(gambitReader, xmlWriter);
+	converter::Gambit2VTK  gambit2vtk(gambitReader, xmlWriter);
+
+	// Get simple files input streams
+	std::vector<std::ifstream*> simpleStreams;
+	std::vector<io::SimpleDataReader*> simpleReaders;
+	std::vector<const char*> simpleFiles = args.simpleFiles();
+	for (std::vector<const char*>::const_iterator i = simpleFiles.begin();
+		i < simpleFiles.end(); i++) {
+		std::ifstream* stream = new std::ifstream(*i);
+		if (stream->good()) {
+			simpleStreams.push_back(stream);
+			simpleReaders.push_back(new io::SimpleDataReader(gambit2vtk, *stream, *i));
+		} else
+			tools::Logger::logger.warning() << "Could not open "
+				<< *i << ", ignoring file" << std::endl;
+	}
+	gambit2vtk.addDataReader(simpleReaders);
+
+	// Start the convertion
+	gambit2vtk.convert();
+
+	// Delete all pointers
+	for (std::vector<std::ifstream*>::iterator i = simpleStreams.begin();
+		i < simpleStreams.end(); i++)
+		delete *i;
 
 	return 0;
 }

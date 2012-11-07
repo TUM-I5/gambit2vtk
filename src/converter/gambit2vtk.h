@@ -37,6 +37,7 @@
 #define CONVERTER_GAMBIT2VTK_H_
 
 #include "converter/converter.h"
+#include "io/datareader.h"
 #include "io/gambitreader.h"
 #include "io/xmlwriter.h"
 
@@ -48,14 +49,18 @@ namespace converter
 class Gambit2VTK : public Converter
 {
 private:
+	io::GambitReader &m_reader;
 	io::XMLWriter &m_writer;
 
 	/** The type of each cell */
 	std::vector<Type> m_cellTypes;
 
+	std::vector<io::DataReader*> m_dataReaders;
+
 public:
 	Gambit2VTK(io::GambitReader &reader, io::XMLWriter &writer)
-		: m_writer(writer)
+		: m_reader(reader),
+		  m_writer(writer)
 	{
 		reader.setConverter(this);
 
@@ -68,17 +73,44 @@ public:
 		writer.attribute("NumberOfPoints", reader.nPoints());
 		writer.attribute("NumberOfCells", reader.nElems());
 
-		reader.parse();
+		m_dataReaders.push_back(&reader);
+	}
 
-		writer.startElement("CellData");
-		writer.attribute("Scalars", reader.dataName());
+	void convert()
+	{
+		m_reader.parse();
 
-		writer.startElement("DataArray");
-		writer.attribute("type", "Int32");
-		writer.attribute("Name", reader.dataName());
-		writer.attribute("Format", "ascii");
+		m_writer.startElement("CellData");
 
-		reader.parseData();
+		// Get a list of all data reader names
+		std::string names;
+		for (size_t i = 0; i < m_dataReaders.size(); i++) {
+			if (i)
+				names += ' ';
+			names += m_dataReaders[i]->dataName();
+		}
+		m_writer.attribute("Scalars", names);
+
+		for (std::vector<io::DataReader*>::const_iterator i = m_dataReaders.begin();
+			i < m_dataReaders.end(); i++) {
+			tools::Logger::logger << "Converting element data "
+				<< (*i)->dataName() << std::endl;
+
+			m_writer.startElement("DataArray");
+			m_writer.attribute("type", "Float64");
+			m_writer.attribute("Name", (*i)->dataName());
+			m_writer.attribute("Format", "ascii");
+
+			(*i)->parseData(m_reader.nElems());
+
+			m_writer.endElement();
+		}
+	}
+
+	template<class T>
+	void addDataReader(std::vector<T*> &dataReaders)
+	{
+		std::copy(dataReaders.begin(), dataReaders.end(), std::back_inserter(m_dataReaders));
 	}
 
 	void startCoordinates()
@@ -163,7 +195,7 @@ public:
 		m_cellTypes.push_back(type);
 	}
 
-	void convertData(long data)
+	void convertData(double data)
 	{
 		m_writer.content(data);
 		m_writer.content(" ");

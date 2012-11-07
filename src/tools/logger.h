@@ -91,6 +91,11 @@ public:
 		*m_output << message << std::endl;
 	}
 
+	std::ostream& info()
+	{
+		return *m_output;
+	}
+
 	void warning(std::string &message)
 	{
 		warning(message.c_str());
@@ -99,6 +104,11 @@ public:
 	void warning(const char* message)
 	{
 		*m_output << "Warning: " << message << std::endl;
+	}
+
+	std::ostream& warning()
+	{
+		return *m_output << "Warning: ";
 	}
 
 	void error(std::string &message)

@@ -271,8 +271,11 @@ public:
 		}
 	}
 
-	void parseData()
+	void parseData(unsigned long size)
 	{
+		if (size != m_group.size())
+			tools::Logger::logger.error("Could not convert group information in gambit file");
+
 		for (std::vector<unsigned int>::const_iterator i = m_group.begin();
 			i < m_group.end(); i++)
 			m_converter->convertData(*i);

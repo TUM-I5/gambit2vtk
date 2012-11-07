@@ -41,6 +41,7 @@
 #include <getopt.h>
 #include <cstdlib>
 #include <iostream>
+#include <vector>
 
 namespace config
 {
@@ -50,6 +51,7 @@ class Args
 private:
 	const char* m_inputFile;
 	const char* m_outputFile;
+	std::vector<const char*> m_simpleFiles;
 	/** Set to 1 if any existing output file should be overwritten */
 	bool m_overwrite;
 
@@ -62,12 +64,13 @@ public:
 		const struct option longOptions[] = {
 			{"input", required_argument, 0, 'i'},
 			{"output", required_argument, 0, 'o'},
+			{"simple", required_argument, 0, 's'},
 			{"force", no_argument, 0, 'f'},
 			{"help", no_argument, 0, 'h'}
 		};
 
 		int c, optionIndex;
-		while ((c = getopt_long(argc, argv, "i:o:fh",
+		while ((c = getopt_long(argc, argv, "i:o:s:fh",
 			longOptions, &optionIndex)) >= 0) {
 			switch (c) {
 			case 0:
@@ -78,6 +81,9 @@ public:
 				break;
 			case 'o':
 				m_outputFile = optarg;
+				break;
+			case 's':
+				m_simpleFiles.push_back(optarg);
 				break;
 			case 'f':
 				m_overwrite = true;
@@ -107,6 +113,11 @@ public:
 		return m_outputFile;
 	}
 
+	const std::vector<const char*>& simpleFiles()
+	{
+		return m_simpleFiles;
+	}
+
 	bool overwrite()
 	{
 		return m_overwrite;
@@ -126,6 +137,8 @@ private:
 			<< "                                (if not set, stdin is used)" << std::endl
 			<< "  -o, --output=FILE.vtu         name of the vtk output file" << std::endl
 			<< "                                (if not set, stdout is used)" << std::endl
+			<< "  -s, --simple=FILE             a simple cell data file" << std::endl
+			<< "                                each line contains one value for one cell" << std::endl
 			<< "  -h, --help                    this help list" << std::endl;
 	}
 };
