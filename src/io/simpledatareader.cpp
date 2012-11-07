@@ -33,20 +33,5 @@
  * @copyright 2012 Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
-#include "gambitreader.h"
+#include "simpledatareader.h"
 
-const converter::Converter::Type io::GambitReader::GAMBIT2INTERNAL[] = {
-		converter::Converter::UNSUPPORTED,
-		converter::Converter::UNSUPPORTED,
-		converter::Converter::UNSUPPORTED,
-		converter::Converter::TRIANGLE,
-		converter::Converter::UNSUPPORTED,
-		converter::Converter::UNSUPPORTED,
-		converter::Converter::TETRA,
-		converter::Converter::UNSUPPORTED};
-
-const char* io::GambitReader::GAMBIT_FILE_ID = "** GAMBIT NEUTRAL FILE";
-const char* io::GambitReader::ENDSECTION = "ENDOFSECTION";
-const char* io::GambitReader::NODAL_COORDINATES = "NODAL COORDINATES";
-const char* io::GambitReader::ELEMENT_CELLS = "ELEMENTS/CELLS";
-const char* io::GambitReader::ELEMENT_GROUP = "ELEMENT GROUP";

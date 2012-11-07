@@ -69,6 +69,16 @@ public:
 		writer.attribute("NumberOfCells", reader.nElems());
 
 		reader.parse();
+
+		writer.startElement("CellData");
+		writer.attribute("Scalars", reader.dataName());
+
+		writer.startElement("DataArray");
+		writer.attribute("type", "Int32");
+		writer.attribute("Name", reader.dataName());
+		writer.attribute("Format", "ascii");
+
+		reader.parseData();
 	}
 
 	void startCoordinates()
@@ -151,6 +161,12 @@ public:
 		}
 
 		m_cellTypes.push_back(type);
+	}
+
+	void convertData(long data)
+	{
+		m_writer.content(data);
+		m_writer.content(" ");
 	}
 private:
 	static const unsigned int INTERNAL2VTK[];

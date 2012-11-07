@@ -55,6 +55,7 @@ public:
 	virtual void endElements() {};
 	virtual void convertCoordinate(std::vector<double> &coordinate) {};
 	virtual void convertElement(std::vector<unsigned long> &coordinates, Type type) {};
+	virtual void convertData(long value) {};
 
 	/**
 	 * @return The number of points for a specific type

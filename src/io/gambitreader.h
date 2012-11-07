@@ -37,6 +37,7 @@
 #define IO_GAMBITREADER_H_
 
 #include "converter/converter.h"
+#include "io/datareader.h"
 #include "tools/logger.h"
 #include "tools/strings.h"
 
@@ -52,10 +53,10 @@ namespace io
 /**
  * Reads a gambit file
  */
-class GambitReader
+class GambitReader : public DataReader
 {
 private:
-	enum Section { NO_SECTION, COORDINATES, ELEMENTS };
+	enum Section { NO_SECTION, COORDINATES, ELEMENTS, GROUP };
 
 	std::istream &m_input;
 	/** Number of points in the mesh */
@@ -72,6 +73,8 @@ private:
 	/** The section we are currently working on */
 	Section m_section;
 
+	/** Group for each element */
+	std::vector<unsigned int> m_group;
 public:
 	GambitReader(std::istream &input)
 		: m_input(input),
@@ -130,6 +133,9 @@ public:
 		trim(line);
 		if (line != ENDSECTION)
 			tools::Logger::logger.error("Unknown gambit file format");
+
+		// We need to store a group for each element
+		m_group.resize(m_nElems);
 	}
 
 	unsigned long nPoints()
@@ -175,6 +181,9 @@ public:
 
 				m_converter->startElements();
 				m_section = ELEMENTS;
+			} else if (line.find(ELEMENT_GROUP) == 0) {
+				// A matrial group
+				m_section = GROUP;
 			} else if (line.find(ENDSECTION) == 0) {
 				// End any open section
 				switch (m_section) {
@@ -194,6 +203,8 @@ public:
 				int n;
 				std::vector<double> coords(m_dimensions);
 				std::vector<unsigned long> points;
+				std::string str;
+				unsigned long element, size;
 
 				// Read values
 				switch (m_section) {
@@ -227,12 +238,49 @@ public:
 
 					m_converter->convertElement(points, type);
 					break;
+				case GROUP:
+					if (line.find("GROUP:") != 0)
+						// Not the beginning of a group??
+						break;
+
+					ss.str(line);
+					ss >> str; // "GROUP:"
+					ss >> n; // group number
+					ss >> str; // "ELEMENTS:"
+					ss >> size; // Number of elements
+
+					m_input >> std::ws; // read white spaces
+					m_input >> str; // material name
+					getline(m_input, line); // Read rest of the line
+					tools::Logger::logger << "Reading material " << str
+						<< std::endl;
+
+					getline(m_input, line); // This line always contains a "0"
+
+					for (unsigned int i = 0; i < size; i++) {
+						m_input >> element;
+						m_group[element-1] = n;
+					}
+
+					break;
 				default:
 					// no known section
 					break;
 				}
 			}
 		}
+	}
+
+	void parseData()
+	{
+		for (std::vector<unsigned int>::const_iterator i = m_group.begin();
+			i < m_group.end(); i++)
+			m_converter->convertData(*i);
+	}
+
+	const char* dataName()
+	{
+		return "group";
 	}
 
 private:
@@ -242,6 +290,7 @@ private:
 	static const char* ENDSECTION;
 	static const char* NODAL_COORDINATES;
 	static const char* ELEMENT_CELLS;
+	static const char* ELEMENT_GROUP;
 };
 
 } /* namespace io */
