@@ -41,6 +41,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 
 /**
  * Check if file already exists
@@ -69,8 +70,11 @@ int main(int argc, char** argv)
 		gambitStream = &std::cin;
 	else {
 		gambitFile.open(args.inputFile(), std::fstream::in);
-		if (!gambitFile.good())
-			tools::Logger::logger.error("Could not open gambit file");
+		if (!gambitFile.good()) {
+			std::string error("Could not open gambit file ");
+			error += args.inputFile();
+			tools::Logger::logger.error(error);
+		}
 
 		gambitStream = &gambitFile;
 	}
