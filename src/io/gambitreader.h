@@ -148,13 +148,13 @@ public:
 
 			if (line.find(NODAL_COORDINATES) == 0) {
 				// Start coords section
-				tools::Logger::logger.info("Start reading coordinates");
+				tools::Logger::logger.info("Reading coordinates");
 
 				m_converter->startCoordinates();
 				m_section = COORDINATES;
 			} else if (line.find(ELEMENT_CELLS) == 0) {
 				// Start element section
-				tools::Logger::logger.info("Start reading elements");
+				tools::Logger::logger.info("Reading elements");
 
 				m_converter->startElements();
 				m_section = ELEMENTS;
