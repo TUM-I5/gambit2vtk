@@ -178,6 +178,7 @@ public:
 			} else {
 				std::istringstream ss;
 				int n;
+				float v;
 				std::vector<double> coords(m_dimensions);
 				std::vector<unsigned long> points;
 				std::string str;
@@ -187,7 +188,8 @@ public:
 				switch (m_section) {
 				case COORDINATES:
 					ss.str(line);
-					ss >> n; // point number
+					ss >> v;	// point number
+								// (this is sometimes stored as a float point value)
 
 					// read coordinates
 					for (unsigned int i = 0; i < m_dimensions; i++)
