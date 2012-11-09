@@ -27,17 +27,39 @@
  *
  * Taken from http://www.cplusplus.com/forum/general/1796/
  */
-bool fexists(const char* filename)
+bool fexists(const std::string &filename)
 {
-	std::ifstream ifile(filename);
+	std::ifstream ifile(filename.c_str());
 	return ifile;
+}
+
+/**
+ * @return The file path and filename without the extension
+ *
+ * Taken form http://stackoverflow.com/questions/6646702/get-file-name-without-extension
+ */
+std::string baseFilename(const char* filename)
+{
+    std::string fName(filename);
+    size_t pos = fName.rfind(".");
+    if(pos == std::string::npos)  //No extension.
+        return fName;
+
+    if(pos == 0)    //. is at the front. Not an extension.
+        return fName;
+
+    return fName.substr(0, pos);
 }
 
 int main(int argc, char** argv)
 {
 	config::Args args(argc, argv);
 
-	if (!args.outpuFile())
+	std::string outputFile;
+	if (args.outputFile())
+		outputFile = args.outputFile();
+
+	if (outputFile == "-")
 		// XML file is printed to std::cout
 		// -> use std::cerr for all log messages
 		tools::Logger::logger.setOutputStream(std::cerr);
@@ -61,17 +83,22 @@ int main(int argc, char** argv)
 	// Get vtk output stream
 	std::ostream *vtkStream;
 	std::ofstream vtkFile;
-	if (args.outpuFile() == 0L)
+	if (outputFile == "-")
 		vtkStream = &std::cout;
 	else {
-		if (!args.overwrite() && fexists(args.outpuFile()))
+		if (outputFile.empty()) {
+			outputFile = baseFilename(args.inputFile()) + ".vtu";
+			tools::Logger::logger << "Output file not specified, using "
+				<< outputFile << std::endl;
+		}
+
+		if (!args.overwrite() && fexists(outputFile))
 			tools::Logger::logger.error("Output file already exists, use -f to overwrite");
 
-		std::string filename(args.outpuFile());
-		if (filename.rfind(".vtu") != filename.size() - 4)
+		if (outputFile.rfind(".vtu") != outputFile.size() - 4)
 			tools::Logger::logger.warning("Output file extension should be .vtu");
 
-		vtkFile.open(args.outpuFile(), std::fstream::out);
+		vtkFile.open(outputFile.c_str(), std::fstream::out);
 		if (!vtkFile.good())
 			tools::Logger::logger.error("Could not open vtk file");
 
