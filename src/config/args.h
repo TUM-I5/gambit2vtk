@@ -116,7 +116,7 @@ private:
 			<< "                                (set to \"-\" for stdout)" << std::endl
 			<< "  -s, --simple=FILE             a simple cell data file" << std::endl
 			<< "                                each line contains one value for one cell" << std::endl
-			<< "  -h, --help                    this help list" << std::endl;
+			<< "  -h, --help                    this help message" << std::endl;
 	}
 };
 
