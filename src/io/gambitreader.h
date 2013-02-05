@@ -6,7 +6,7 @@
  *  notice in the file 'COPYING' at the root directory of this package
  *  and the copyright notice at https://github.com/TUM-I5/gambit2vtk
  *
- * @copyright 2012 Technische Universitaet Muenchen
+ * @copyright 2012-2013 Technische Universitaet Muenchen
  * @author Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
@@ -257,12 +257,17 @@ public:
 
 		for (std::vector<unsigned int>::const_iterator i = m_group.begin();
 			i < m_group.end(); i++)
-			m_converter->convertData(*i);
+			m_converter->convertData(static_cast<long>(*i));
 	}
 
 	const char* dataName()
 	{
 		return "group";
+	}
+
+	Type dataType()
+	{
+		return INT64;
 	}
 
 private:

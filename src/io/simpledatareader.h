@@ -6,7 +6,7 @@
  *  notice in the file 'COPYING' at the root directory of this package
  *  and the copyright notice at https://github.com/TUM-I5/gambit2vtk
  *
- * @copyright 2012 Technische Universitaet Muenchen
+ * @copyright 2012-2013 Technische Universitaet Muenchen
  * @author Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
@@ -53,6 +53,11 @@ public:
 	const char* dataName()
 	{
 		return m_name.c_str();
+	}
+
+	Type dataType()
+	{
+		return FLOAT64;
 	}
 
 private:

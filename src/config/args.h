@@ -6,7 +6,7 @@
  *  notice in the file 'COPYING' at the root directory of this package
  *  and the copyright notice at https://github.com/TUM-I5/gambit2vtk
  *
- * @copyright 2012 Technische Universitaet Muenchen
+ * @copyright 2012-2013 Technische Universitaet Muenchen
  * @author Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
@@ -28,6 +28,7 @@ class Args
 private:
 	const char* m_inputFile;
 	const char* m_outputFile;
+	bool m_addIndex;
 	std::vector<const char*> m_simpleFiles;
 	/** Set to 1 if any existing output file should be overwritten */
 	bool m_overwrite;
@@ -36,18 +37,20 @@ public:
 	Args(int argc, char** argv)
 		: m_inputFile(0L),
 		  m_outputFile(0L),
+		  m_addIndex(false),
 		  m_overwrite(false)
 	{
 		const struct option longOptions[] = {
 			{"input", required_argument, 0, 'i'},
 			{"output", required_argument, 0, 'o'},
+			{"index", no_argument, 0, 'd'},
 			{"simple", required_argument, 0, 's'},
 			{"force", no_argument, 0, 'f'},
 			{"help", no_argument, 0, 'h'}
 		};
 
 		int c, optionIndex;
-		while ((c = getopt_long(argc, argv, "i:o:s:fh",
+		while ((c = getopt_long(argc, argv, "i:o:ds:fh",
 			longOptions, &optionIndex)) >= 0) {
 			switch (c) {
 			case 0:
@@ -58,6 +61,9 @@ public:
 				break;
 			case 'o':
 				m_outputFile = optarg;
+				break;
+			case 'd':
+				m_addIndex = true;
 				break;
 			case 's':
 				m_simpleFiles.push_back(optarg);
@@ -80,22 +86,27 @@ public:
 		}
 	}
 
-	const char* inputFile()
+	const char* inputFile() const
 	{
 		return m_inputFile;
 	}
 
-	const char* outputFile()
+	const char* outputFile() const
 	{
 		return m_outputFile;
 	}
 
-	const std::vector<const char*>& simpleFiles()
+	bool addIndex() const
+	{
+		return m_addIndex;
+	}
+
+	const std::vector<const char*>& simpleFiles() const
 	{
 		return m_simpleFiles;
 	}
 
-	bool overwrite()
+	bool overwrite() const
 	{
 		return m_overwrite;
 	}
@@ -114,6 +125,7 @@ private:
 			<< "                                (if not set, stdin is used)" << std::endl
 			<< "  -o, --output=FILE.vtu         name of the vtk output file" << std::endl
 			<< "                                (set to \"-\" for stdout)" << std::endl
+			<< "  -d, --index                   add the index to the cell values" << std::endl
 			<< "  -s, --simple=FILE             a simple cell data file" << std::endl
 			<< "                                each line contains one value for one cell" << std::endl
 			<< "  -h, --help                    this help message" << std::endl;

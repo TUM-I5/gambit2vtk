@@ -6,13 +6,14 @@
  *  notice in the file 'COPYING' at the root directory of this package
  *  and the copyright notice at https://github.com/TUM-I5/gambit2vtk
  *
- * @copyright 2012 Technische Universitaet Muenchen
+ * @copyright 2012-2013 Technische Universitaet Muenchen
  * @author Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
 #include "config/args.h"
 #include "converter/gambit2vtk.h"
 #include "io/gambitreader.h"
+#include "io/indexdatareader.h"
 #include "io/simpledatareader.h"
 #include "io/xmlwriter.h"
 #include "tools/logger.h"
@@ -109,6 +110,11 @@ int main(int argc, char** argv)
 	io::XMLWriter xmlWriter(*vtkStream);
 
 	converter::Gambit2VTK  gambit2vtk(gambitReader, xmlWriter);
+
+	// Add index data
+	io::IndexDataReader indexReader(gambit2vtk);
+	if (args.addIndex())
+		gambit2vtk.addDataReader(indexReader);
 
 	// Get simple files input streams
 	std::vector<std::ifstream*> simpleStreams;

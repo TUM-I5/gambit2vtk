@@ -6,7 +6,7 @@
  *  notice in the file 'COPYING' at the root directory of this package
  *  and the copyright notice at https://github.com/TUM-I5/gambit2vtk
  *
- * @copyright 2012 Technische Universitaet Muenchen
+ * @copyright 2012-2013 Technische Universitaet Muenchen
  * @author Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
@@ -33,6 +33,7 @@ public:
 	virtual void convertCoordinate(std::vector<double> &coordinate) {};
 	virtual void convertElement(std::vector<unsigned long> &coordinates, Type type) {};
 	virtual void convertData(double value) {};
+	virtual void convertData(long value) {};
 
 	/**
 	 * @return The number of points for a specific type

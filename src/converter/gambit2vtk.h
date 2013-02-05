@@ -6,7 +6,7 @@
  *  notice in the file 'COPYING' at the root directory of this package
  *  and the copyright notice at https://github.com/TUM-I5/gambit2vtk
  *
- * @copyright 2012 Technische Universitaet Muenchen
+ * @copyright 2012-2013 Technische Universitaet Muenchen
  * @author Sebastian Rettenberger <rettenbs@in.tum.de>
  */
 
@@ -74,7 +74,15 @@ public:
 				<< (*i)->dataName() << std::endl;
 
 			m_writer.startElement("DataArray");
-			m_writer.attribute("type", "Float64");
+			switch ((*i)->dataType())
+			{
+			case io::DataReader::INT64:
+				m_writer.attribute("type", "Int64");
+				break;
+			case io::DataReader::FLOAT64:
+				m_writer.attribute("type", "Float64");
+				break;
+			}
 			m_writer.attribute("Name", (*i)->dataName());
 			m_writer.attribute("Format", "ascii");
 
@@ -82,6 +90,12 @@ public:
 
 			m_writer.endElement();
 		}
+	}
+
+	template<class T>
+	void addDataReader(T &dataReader)
+	{
+		m_dataReaders.push_back(&dataReader);
 	}
 
 	template<class T>
@@ -173,6 +187,12 @@ public:
 	}
 
 	void convertData(double data)
+	{
+		m_writer.content(data);
+		m_writer.content(" ");
+	}
+
+	void convertData(long data)
 	{
 		m_writer.content(data);
 		m_writer.content(" ");
