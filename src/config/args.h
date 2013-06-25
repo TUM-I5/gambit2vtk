@@ -46,7 +46,8 @@ public:
 			{"index", no_argument, 0, 'd'},
 			{"simple", required_argument, 0, 's'},
 			{"force", no_argument, 0, 'f'},
-			{"help", no_argument, 0, 'h'}
+			{"help", no_argument, 0, 'h'},
+			{0, 0, 0, 0}
 		};
 
 		int c, optionIndex;
